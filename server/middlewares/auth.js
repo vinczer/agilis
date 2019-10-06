@@ -1,4 +1,4 @@
-const { Player } = require('../models');
+const { Player } = require('../models/home');
 
 module.exports = async (req, res, next) => {
     try {
