@@ -45,3 +45,19 @@
             "success": true,
             "msg": "Player logged out!"
         }
+        
+## /games
+ - ### response
+   
+        {
+            "success": true,
+            "games": { id: 5d926d389d590407544978b8, name: "Amoba" }
+        }
+        
+ ## /lobbies
+ - ### response
+   
+        {
+            "success": true,
+            "games": { id: 5d926d389d590407544978b8, name: "Amoba", playerName: "John" }
+        }
