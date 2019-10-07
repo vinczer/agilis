@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="startingpage.js"></script>
-    <link rel="stylesheet" href="startingpage.css">
+    <script src="userPage.js"></script>
+    <link rel="stylesheet" href="userPage.css">
     <title>Starting page</title>
 </head>
 <body>
 <div class="root">
     <div id="login" class="login" onclick="login()">Login</div>
     <div id="register" class="register" onclick="register()">Register</div>
-    <form class="login-form" id="loginForm" action="../site/index.html">
+    <form class="login-form" id="loginForm" action="../home/homePage.html">
         <h1>Login</h1><br>
-        <input type="text" placeholder="type username" required>
-        <input type="submit" onclick="loginsubmit()">
+        <label>
+            <input type="text" placeholder="type username" required>
+        </label>
+        <input type="submit" onclick="loginSubmit()">
     </form>
-    <form class="register-form" id="registerForm" action="startingPage.html">
+    <form class="register-form" id="registerForm" action="userPage.html">
         <h1>Register</h1><br>
-        <input type="text" placeholder="type username" required>
-        <input type="submit" onclick="registersubmit()">
+        <label>
+            <input type="text" placeholder="type username" required>
+        </label>
+        <input type="submit" onclick="registerSubmit()">
     </form>
 </div>
 

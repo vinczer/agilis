@@ -28,10 +28,6 @@ function register() {
     reg.style.color = '#fff';
 }
 
-function loginsubmit() {
+function loginSubmit() {}
 
-}
-
-function registersubmit() {
-
-}
+function registerSubmit() {}
