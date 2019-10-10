@@ -2,7 +2,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
-const { list_games, list_lobbies } = require('../routes/home');
+const { list_games, list_lobbies } = require('./routes');
 
 const app = express();
 

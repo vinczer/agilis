@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Player } = require('../models/home');
+const { Player } = require('../models');
 
 router.post('/', async (req, res) => {
     var name = req.body.username;
