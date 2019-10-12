@@ -2,7 +2,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
-const { listGames, listLobbies } = require('./routes');
+const { listGames } = require('./routes');
+require('./websocket');
 
 const app = express();
 
@@ -10,7 +11,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/api/games', listGames);
-app.use('/api/lobbies', listLobbies);
 
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000/');
