@@ -1,11 +1,9 @@
-var express = require('express');
-var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io').listen(server);
-
-server.listen(3001);
+var initGameEvents = require('./game');
 
 module.exports = {
-    game: require('./game')(io.of('/game')),
+  init: server => {
+    var io = require('socket.io').listen(server);
+
+    initGameEvents(io.of('/game'));
+  },
 };
-  
