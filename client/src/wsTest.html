@@ -17,15 +17,32 @@
     <script>
       $(document).ready(function() {
         var gameSocket = io('http://localhost:3000/game');
+        var cnt = 2;
 
         gameSocket.on('connect', function() {
-          gameSocket.emit('createRoom', 'Lajos', 'room1');
-          gameSocket.emit('createRoom', 'Peter', 'room2');
-          gameSocket.emit('joinRoom', 'Imre', 'room1');
+          gameSocket.emit('listLobbies', 'amoba');
+          gameSocket.emit('createRoom', 'Lajos', 'amoba');
 
           // events
           gameSocket.on('updateRoomList', function(rooms) {
-            console.log(rooms);
+            console.log('rooms', rooms);
+            cnt--;
+            if (cnt == 0) {
+              console.log('rooms before enter', rooms);
+              for (key in rooms) {
+                gameSocket.emit('joinRoom', 'Imre', key);
+                gameSocket.emit('joinRoom', 'Imre', key);
+                break;
+              }
+            }
+          });
+
+          gameSocket.on('joinRoomFailed', function(name) {
+            console.log('joinRoomFailed with name', name);
+          });
+
+          gameSocket.on('joinRoomSuccess', function(name) {
+            console.log('joinRoomSuccess with name', name);
           });
         });
       });
