@@ -1,29 +1,19 @@
-var express = require('express');
-var mongoose = require('mongoose');
+var app = require('express')();
 var bodyParser = require('body-parser');
+var http = require('http').createServer(app);
 
-const { listGames, listLobbies } = require('./routes');
+var websocket = require('./websocket');
+var db = require('./db');
+var { listGames } = require('./routes');
 
-const app = express();
+websocket.init(http);
+db.init();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/api/games', listGames);
-app.use('/api/lobbies', listLobbies);
 
-app.listen(3000, () => {
+http.listen(3000, () => {
   console.log('Server running at http://localhost:3000/');
 });
-
-mongoose
-  .connect('mongodb://localhost/agile', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB.'))
-  /*  
-        add new game to db
-        
-        const { Game } = require('./models');
-        const newGameAmoba = new Game({ name: "Amoba" });
-        await newGameAmoba.save();
-    */
-  .catch(err => console.error('Could not connect to MongoDB.', err));
