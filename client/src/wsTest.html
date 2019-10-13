@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      WS Test
+    </title>
+  </head>
+
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      $(document).ready(function() {
+        var gameSocket = io('http://localhost:3000/game');
+
+        gameSocket.on('connect', function() {
+          gameSocket.emit('createRoom', 'Lajos', 'room1');
+          gameSocket.emit('createRoom', 'Peter', 'room2');
+          gameSocket.emit('joinRoom', 'Imre', 'room1');
+
+          // events
+          gameSocket.on('updateRoomList', function(rooms) {
+            console.log(rooms);
+          });
+        });
+      });
+    </script>
+
+    <h1>WS Test</h1>
+  </body>
+</html>

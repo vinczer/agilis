@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="userPage.js"></script>
+    <link rel="stylesheet" href="userPage.css">
+    <title>Starting page</title>
+</head>
+<body>
+<div class="root">
+    <div id="login" class="login" onclick="login()">Login</div>
+    <div id="register" class="register" onclick="register()">Register</div>
+    <form class="login-form" id="loginForm" action="../home/homePage.html">
+        <h1>Login</h1><br>
+        <label>
+            <input type="text" placeholder="type username" required>
+        </label>
+        <input type="submit" onclick="loginSubmit()">
+    </form>
+    <form class="register-form" id="registerForm" action="userPage.html">
+        <h1>Register</h1><br>
+        <label>
+            <input type="text" placeholder="type username" required>
+        </label>
+        <input type="submit" onclick="registerSubmit()">
+    </form>
+</div>
+
+</body>
+</html>
