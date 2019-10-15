@@ -2,7 +2,7 @@ let rooms = {};
 
 module.exports = function(gameSocket) {
   gameSocket.on('connection', function(socket) {
-    socket.emit('updateRoomList', rooms);
+    gameSocket.emit('updateRoomList', rooms);
 
     // events:
     socket.on('createRoom', function(username, room) {
@@ -20,7 +20,7 @@ module.exports = function(gameSocket) {
         ],
       };
 
-      socket.emit('updateRoomList', rooms);
+      gameSocket.emit('updateRoomList', rooms);
 
       console.log('New room: ' + room + ', Created by: ' + username);
     });
@@ -34,12 +34,20 @@ module.exports = function(gameSocket) {
 
         rooms[room].users.push({ name: username });
 
-        socket.emit('updateRoomList', rooms);
+        gameSocket.emit('updateRoomList', rooms);
 
         console.log(username + ' has connected to ' + room);
       } else {
         console.log('Room not found: ' + room);
       }
     });
+
+    socket.on('disconnect', function() {
+      if (socket.room !== undefined) {
+        delete rooms[socket.room];
+        gameSocket.emit('updateRoomList', rooms);
+        console.log('Room deleted: ' + socket.room);
+      }
+   });
   });
 };
