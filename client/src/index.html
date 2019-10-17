@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        WS Demo
+    </title>
+    <link rel="stylesheet" type="text/css" href="assets/style.css">
+    <link rel="stylesheet" type="text/css" href="assets/bootstrap-4.3.1-dist/css/bootstrap.css">
+</head>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="assets/script.js"></script>
+    <script src="assets/bootstrap-4.3.1-dist/js/bootstrap.js"></script>
+
+
+    <div class="container text-center">
+        <h1 class="mb-3">WS Games</h1>
+        <div class="connect-wrapper">
+            <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="border p-1 bg-light">
+                        <h2>Amőba</h2>
+                        <div class="p-3">
+                            <img class="img-fluid mb-3" src="images/amoba.jpg">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <a href="#" class="btn btn-secondary w-100 mb-2 mb-lg-0 create">Létrehozás</a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <a href="#" class="btn btn-secondary w-100 list">Csatlakozás</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="border p-1 bg-light">
+                        <h2>Torpedó</h2>
+                        <div class="p-3">
+                            <img class="img-fluid mb-3" src="images/torpedo.jpg">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <a href="#" class="btn btn-secondary w-100 mb-2 mb-lg-0 disabled">Létrehozás</a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <a href="#" class="btn btn-secondary w-100 disabled">Csatlakozás</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list-wrapper">
+            LIST
+        </div>
+        <div class="game-wrapper">
+            GAME
+        </div>
+    </div>
+
+</body>
+
+</html>
