@@ -5,6 +5,10 @@ const gameSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    required: true,
+  },
 });
 
 const Game = mongoose.model('Game', gameSchema);
