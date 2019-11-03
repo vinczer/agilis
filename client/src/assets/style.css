@@ -1,3 +1,5 @@
-.list-wrapper, .game-wrapper {
-	display: none;
+.list-wrapper,
+.game-wrapper,
+.az-igazi-game-wrapper {
+  display: none;
 }
