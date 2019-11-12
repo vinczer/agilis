@@ -36,18 +36,19 @@ $(document).ready(function() {
     let tmp = '';
     for (let room in rooms) {
       tmp +=
-        '<button type="button" class="join" data-room="' +
+        '<button type="button" class="join btn btn-secondary" data-room="' +
         rooms[room].name +
         '">' +
         rooms[room].creator +
-        '</button><br>';
+        ' szobája' +
+        '</button><br><br>';
     }
 
     $('.list-wrapper .items').html(tmp);
   });
 
   $('.create').click(function() {
-    let username = prompt('Username:');
+    let username = document.getElementById('username').value;;
     gameSocket.emit('createRoom', username, 'amoba');
     playerName = username;
 
