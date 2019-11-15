@@ -48,7 +48,7 @@ $(document).ready(function() {
   });
 
   $('.create').click(function() {
-    let username = document.getElementById('username').value;;
+    let username = document.getElementById('username').value;
     gameSocket.emit('createRoom', username, 'amoba');
     playerName = username;
 
@@ -64,10 +64,15 @@ $(document).ready(function() {
   });
 
   $('.list-wrapper').on('click', '.join', function() {
-    let username = prompt('Username:');
+    let room = $(this).data('room');
+    $('.csatlakozas').click(function() {
+      let username = document.getElementById('joinname').value;
 
-    gameSocket.emit('joinRoom', username, $(this).data('room'));
+      gameSocket.emit('joinRoom', username, room);
+    });
   });
+  
+  
 
   let c = document.getElementById('ex');
   let ctx = c.getContext('2d');
