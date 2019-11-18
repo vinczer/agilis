@@ -1,4 +1,5 @@
 var initLobbyEvents = require('./lobbies');
+var initGameEvents = require('./games');
 
 let rooms = {};
 let games = {};
@@ -8,5 +9,7 @@ module.exports = function(io) {
     console.log('user connected');
 
     initLobbyEvents(io, socket, rooms, games);
+
+    initGameEvents(io, socket, rooms, games);
   });
 };
