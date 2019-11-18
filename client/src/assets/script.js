@@ -151,11 +151,11 @@ $(document).ready(function() {
     buttons.forEach(function(button, i) {
       button.addEventListener('click', function() {
         if (enemyTurn) return;
-        nextRound(button);
-        gameSocket.emit('playerStep', i);
-        console.log('playerStep', i);
-        checkWinner();
-        playerTurnCanvasInfo();
+        if (nextRound(button)) {
+          gameSocket.emit('playerStep', i);
+          checkWinner();
+          playerTurnCanvasInfo();
+        }
       });
     });
   }
@@ -169,7 +169,7 @@ $(document).ready(function() {
 
   // change button's color when clicking on a button (2 colors)
   function nextRound(button) {
-    if (button.style.background !== BLUE && button.style.background !== RED) {
+    if (button.style.background.split(' ')[0] !== BLUE && button.style.background.split(' ')[0] !== RED) {
       if (enemyTurn) {
         button.style.background = BLUE;
         button.id = BLUE;
@@ -178,7 +178,9 @@ $(document).ready(function() {
         button.id = RED;
       }
       enemyTurn = !enemyTurn;
+      return true;
     } else alert('This element has already been chosen!');
+    return false;
   }
 
   // check if the board has a winning state or not -> this function is called when a button is clicked
