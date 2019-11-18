@@ -11,6 +11,10 @@ module.exports = {
 
     await Game.deleteMany({});
 
-    new Game({ name: 'Amoba', type: 'amoba' }).save(err => console.log);
+    new Game({
+      name: 'Amoba',
+      type: 'amoba',
+      parameters: { size: 'Table Size', winLength: 'Win Length' },
+    }).save(err => console.log);
   },
 };

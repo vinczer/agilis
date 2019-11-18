@@ -20,16 +20,15 @@ $(document).ready(function() {
     $('.game-wrapper').show();
   });
 
-  gameSocket.on('gameStarted', function(playerTurn) {
+  gameSocket.on('gameStarted', function(playerTurn, parameters) {
     enemyTurn = playerTurn !== playerName;
-    console.log('playerTurn', playerTurn, 'playerName', playerName);
 
     $('.connect-wrapper').hide();
     $('.list-wrapper').hide();
     $('.game-wrapper').hide();
     $('.az-igazi-game-wrapper').show();
 
-    startGame();
+    startGame(parameters);
   });
 
   gameSocket.on('updateRoomList', function(rooms) {
@@ -47,8 +46,26 @@ $(document).ready(function() {
   });
 
   $('.create').click(function() {
+    // TODO: create modal for input values
+    // TODO: get parameter names for selected game type,
+    // from game list received on page load (http://localhost:3000/api/games)
+
     let username = prompt('Username:');
-    gameSocket.emit('createRoom', username, 'amoba');
+    let size;
+    let winLength;
+    let success = false;
+    while (!success) {
+      size = prompt('Size:');
+      success = !isNaN(size);
+    }
+    size = parseInt(size);
+    success = false;
+    while (!success) {
+      winLength = prompt('Win Length:');
+      success = !isNaN(winLength);
+    }
+    winLength = parseInt(winLength);
+    gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
     playerName = username;
 
     $('.connect-wrapper').hide();
@@ -70,9 +87,6 @@ $(document).ready(function() {
 
   let c = document.getElementById('ex');
   let ctx = c.getContext('2d');
-  let selectMapSize = document.getElementById('mapSize');
-  let selectWinLength = document.getElementById('lengthOfWin');
-  let startButtonID = document.getElementById('startButton');
 
   const NEUTRAL = 'neutral';
   const RED = 'red';
@@ -104,25 +118,18 @@ $(document).ready(function() {
     playerTurnCanvasInfo();
   }
 
-  function startGame() {
-    height = selectMapSize.options[selectMapSize.selectedIndex].value;
-    height = 3;
-    width = height;
-    winLength = selectWinLength.options[selectWinLength.selectedIndex].value;
-    winLength = 3;
+  function startGame(parameters) {
+    height = parameters.size;
+    width = parameters.size;
+    winLength = parameters.winLength;
 
     if (height !== 0 && winLength !== 0) {
-      selectMapSize.disabled = true;
-      selectWinLength.disabled = true;
-      startButtonID.disabled = true;
       createCanvasInfo();
       loadGame();
     }
   }
 
   function createMap() {
-    height = 3;
-    width = height;
     for (let i = 0; i < width * height; i++) {
       let j = i + 1;
       buttons[i] = document.createElement('button');
@@ -135,7 +142,6 @@ $(document).ready(function() {
 
   gameSocket.on('playerStep', function(username, idx) {
     if (playerName === username) return;
-    console.log('playerStep', idx);
     nextRound(buttons[idx]);
     checkWinner();
     playerTurnCanvasInfo();

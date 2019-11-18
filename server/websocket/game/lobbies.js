@@ -20,7 +20,7 @@ let broadcastRoomList = async (io, rooms) => {
 };
 
 module.exports = (io, socket, rooms, games) => {
-  socket.on('createRoom', function(username, game_type) {
+  socket.on('createRoom', function(username, game_type, parameters) {
     socket.username = username;
     socket.room = `${game_type}_${Date.now()}`;
 
@@ -35,6 +35,7 @@ module.exports = (io, socket, rooms, games) => {
           name: username,
         },
       },
+      parameters,
     };
     broadcastRoomList(io, rooms);
     console.log('New room: ' + socket.room + ', Created by: ' + username);
@@ -74,7 +75,7 @@ module.exports = (io, socket, rooms, games) => {
       delete rooms[room];
       broadcastRoomList(io, rooms);
       socket.emit('joinRoomSuccess', username, room);
-      io.in(room).emit('gameStarted', Object.keys(games[room].users)[games[room].playerTurn]);
+      io.in(room).emit('gameStarted', Object.keys(games[room].users)[games[room].playerTurn], games[room].parameters);
       console.log(username + ' has connected to ' + room);
     } else {
       console.log('Room not found: ' + room);
