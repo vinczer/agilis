@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html >
+<html>
   <head>
     <title>
       WS Demo
     </title>
     <link rel="stylesheet" type="text/css" href="assets/style.css" />
     <link rel="stylesheet" type="text/css" href="assets/bootstrap-4.3.1-dist/css/bootstrap.css" />
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
   </head>
 
   <body>
@@ -30,7 +30,14 @@
                 <img class="img-fluid mb-3" src="images/amoba.jpg" />
                 <div class="row">
                   <div class="col-12 col-md-6">
-                    <a href="#" class="btn btn-secondary w-100 mb-2 mb-lg-0 create">Létrehozás</a>
+                    <a
+                      href="#"
+                      class="btn btn-secondary w-100 mb-2 mb-lg-0 "
+                      data-toggle="modal"
+                      data-target="#myModal"
+                    >
+                      Létrehozás
+                    </a>
                   </div>
                   <div class="col-12 col-md-6">
                     <a href="#" class="btn btn-secondary w-100 list">Csatlakozás</a>
@@ -58,34 +65,79 @@
         </div>
       </div>
 
-      <div class="list-wrapper">
-        LIST
-        <div class="items"></div>
+      <div class="list-wrapper border p-1 bg-light">
+        <h2>Lista</h2>
+        <div data-toggle="modal" data-target="#myModal2" class="items "></div>
+        <button onClick="window.location.reload();" type="button" class="btn btn-secondary">Vissza</button>
       </div>
-      <div class="game-wrapper">
-        LOBBY
+      <div class="game-wrapper border p-1 bg-light">
+        <div class="">
+          <h2>Szoba</h2>
+          <h4>Várakozás a többi játékosra.</h4>
+        </div>
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border" role="status"></div>
+        </div>
+        <br />
+        <button onClick="window.location.reload();" type="button" class="btn btn-secondary">Vissza</button>
       </div>
+
       <div id="body" class="az-igazi-game-wrapper">
         <canvas id="ex" height="200" width="567"></canvas>
 
-        <div>
-          <select id="mapSize" style="width: 200px;">
-            <option value="0">Choose one option</option>
-            <option value="10">10 x 10</option>
-            <option value="12">12 x 12</option>
-            <option value="14">14 x 14</option>
-            <option value="16">16 x 16</option>
-          </select>
+        <div></div>
+      </div>
+    </div>
+    <div class="modal" id="myModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Szoba létrehozás</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <h5 class="modal-title">Add meg a neved:</54>
+            <div class="form-group">
+              <input type="text" class="form-control" id="username" placeholder="Név" />
+            </div>
 
-          <select id="lengthOfWin" style="width: 260px;">
-            <option value="0">Choose the length of the winnings state</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
+            <h5 class="modal-title">Méret:</h5>
+            <div class="form-group">
+              <input type="number" class="form-control" id="size" placeholder="Méret" />
+            </div>
 
-          <button id="startButton" onClick="startGame()" style="width: 100px;">Start game</button>
+            <h5 class="modal-title">Győzelmi hossz:</h5>
+            <div class="form-group">
+              <input type="number" class="form-control" id="winLength" placeholder="Győzelmi hossz" />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-secondary create" data-dismiss="modal">Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="myModal2">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Add meg a neved:</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <input type="text" class="form-control" id="joinname" placeholder="Név" />
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-secondary csatlakozas" data-dismiss="modal">Ok</button>
+          </div>
         </div>
       </div>
     </div>

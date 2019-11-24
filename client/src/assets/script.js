@@ -20,35 +20,66 @@ $(document).ready(function() {
     $('.game-wrapper').show();
   });
 
-  gameSocket.on('gameStarted', function(playerTurn) {
+  gameSocket.on('gameStarted', function(playerTurn, parameters) {
     enemyTurn = playerTurn !== playerName;
-    console.log('playerTurn', playerTurn, 'playerName', playerName);
 
     $('.connect-wrapper').hide();
     $('.list-wrapper').hide();
     $('.game-wrapper').hide();
     $('.az-igazi-game-wrapper').show();
 
-    startGame();
+    startGame(parameters);
   });
 
   gameSocket.on('updateRoomList', function(rooms) {
     let tmp = '';
     for (let room in rooms) {
       tmp +=
-        '<button type="button" class="join" data-room="' +
+        '<button type="button" class="join btn btn-secondary" data-room="' +
         rooms[room].name +
         '">' +
         rooms[room].creator +
-        '</button><br>';
+        ' szobája' +
+        '</button><br><br>';
     }
 
     $('.list-wrapper .items').html(tmp);
   });
 
   $('.create').click(function() {
+    /*
+    // TODO: create modal for input values
+    // TODO: get parameter names for selected game type,
+    // from game list received on page load (http://localhost:3000/api/games)
+
     let username = prompt('Username:');
-    gameSocket.emit('createRoom', username, 'amoba');
+    let size;
+    let winLength;
+    let success = false;
+    while (!success) {
+      size = prompt('Size:');
+      success = !isNaN(size);
+    }
+    size = parseInt(size);
+    success = false;
+    while (!success) {
+      winLength = prompt('Win Length:');
+      success = !isNaN(winLength);
+    }
+    winLength = parseInt(winLength);
+    gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
+    */
+
+    let username = document.getElementById('username').value;
+    let size = document.getElementById('size').value;
+    let winLength = document.getElementById('winLength').value;
+    if (isNaN(size) || isNaN(winLength)) return;
+
+    size = Math.min(10, Math.max(parseInt(size), 3));
+    winLength = Math.min(10, Math.max(parseInt(winLength), 3));
+
+    gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
+
     playerName = username;
 
     $('.connect-wrapper').hide();
@@ -63,16 +94,16 @@ $(document).ready(function() {
   });
 
   $('.list-wrapper').on('click', '.join', function() {
-    let username = prompt('Username:');
+    let room = $(this).data('room');
+    $('.csatlakozas').click(function() {
+      let username = document.getElementById('joinname').value;
 
-    gameSocket.emit('joinRoom', username, $(this).data('room'));
+      gameSocket.emit('joinRoom', username, room);
+    });
   });
 
   let c = document.getElementById('ex');
   let ctx = c.getContext('2d');
-  let selectMapSize = document.getElementById('mapSize');
-  let selectWinLength = document.getElementById('lengthOfWin');
-  let startButtonID = document.getElementById('startButton');
 
   const NEUTRAL = 'neutral';
   const RED = 'red';
@@ -104,25 +135,18 @@ $(document).ready(function() {
     playerTurnCanvasInfo();
   }
 
-  function startGame() {
-    height = selectMapSize.options[selectMapSize.selectedIndex].value;
-    height = 3;
-    width = height;
-    winLength = selectWinLength.options[selectWinLength.selectedIndex].value;
-    winLength = 3;
+  function startGame(parameters) {
+    height = parameters.size;
+    width = parameters.size;
+    winLength = parameters.winLength;
 
     if (height !== 0 && winLength !== 0) {
-      selectMapSize.disabled = true;
-      selectWinLength.disabled = true;
-      startButtonID.disabled = true;
       createCanvasInfo();
       loadGame();
     }
   }
 
   function createMap() {
-    height = 3;
-    width = height;
     for (let i = 0; i < width * height; i++) {
       let j = i + 1;
       buttons[i] = document.createElement('button');
@@ -135,7 +159,6 @@ $(document).ready(function() {
 
   gameSocket.on('playerStep', function(username, idx) {
     if (playerName === username) return;
-    console.log('playerStep', idx);
     nextRound(buttons[idx]);
     checkWinner();
     playerTurnCanvasInfo();
@@ -145,11 +168,11 @@ $(document).ready(function() {
     buttons.forEach(function(button, i) {
       button.addEventListener('click', function() {
         if (enemyTurn) return;
-        nextRound(button);
-        gameSocket.emit('playerStep', i);
-        console.log('playerStep', i);
-        checkWinner();
-        playerTurnCanvasInfo();
+        if (nextRound(button)) {
+          gameSocket.emit('playerStep', i);
+          checkWinner();
+          playerTurnCanvasInfo();
+        }
       });
     });
   }
@@ -163,7 +186,7 @@ $(document).ready(function() {
 
   // change button's color when clicking on a button (2 colors)
   function nextRound(button) {
-    if (button.style.background !== BLUE && button.style.background !== RED) {
+    if (button.style.background.split(' ')[0] !== BLUE && button.style.background.split(' ')[0] !== RED) {
       if (enemyTurn) {
         button.style.background = BLUE;
         button.id = BLUE;
@@ -172,7 +195,9 @@ $(document).ready(function() {
         button.id = RED;
       }
       enemyTurn = !enemyTurn;
+      return true;
     } else alert('This element has already been chosen!');
+    return false;
   }
 
   // check if the board has a winning state or not -> this function is called when a button is clicked
