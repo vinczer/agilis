@@ -69,8 +69,17 @@ $(document).ready(function() {
     winLength = parseInt(winLength);
     gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
     */
+
     let username = document.getElementById('username').value;
-    gameSocket.emit('createRoom', username, 'amoba');
+    let size = document.getElementById('size').value;
+    let winLength = document.getElementById('winLength').value;
+    if (isNaN(size) || isNaN(winLength)) return;
+
+    size = Math.min(10, Math.max(parseInt(size), 3));
+    winLength = Math.min(10, Math.max(parseInt(winLength), 3));
+
+    gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
+
     playerName = username;
 
     $('.connect-wrapper').hide();
