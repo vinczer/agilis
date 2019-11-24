@@ -35,17 +35,19 @@ $(document).ready(function() {
     let tmp = '';
     for (let room in rooms) {
       tmp +=
-        '<button type="button" class="join" data-room="' +
+        '<button type="button" class="join btn btn-secondary" data-room="' +
         rooms[room].name +
         '">' +
         rooms[room].creator +
-        '</button><br>';
+        ' szobája' +
+        '</button><br><br>';
     }
 
     $('.list-wrapper .items').html(tmp);
   });
 
   $('.create').click(function() {
+    /*
     // TODO: create modal for input values
     // TODO: get parameter names for selected game type,
     // from game list received on page load (http://localhost:3000/api/games)
@@ -66,6 +68,9 @@ $(document).ready(function() {
     }
     winLength = parseInt(winLength);
     gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
+    */
+    let username = document.getElementById('username').value;
+    gameSocket.emit('createRoom', username, 'amoba');
     playerName = username;
 
     $('.connect-wrapper').hide();
@@ -80,9 +85,12 @@ $(document).ready(function() {
   });
 
   $('.list-wrapper').on('click', '.join', function() {
-    let username = prompt('Username:');
+    let room = $(this).data('room');
+    $('.csatlakozas').click(function() {
+      let username = document.getElementById('joinname').value;
 
-    gameSocket.emit('joinRoom', username, $(this).data('room'));
+      gameSocket.emit('joinRoom', username, room);
+    });
   });
 
   let c = document.getElementById('ex');
