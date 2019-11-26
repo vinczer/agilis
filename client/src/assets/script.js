@@ -166,7 +166,7 @@ $(document).ready(function() {
 
   // change button's color on click (2 colors)
   function nextRound(button) {
-    if (button.id === BLUE && button.id === RED) {
+    if (button.id === BLUE || button.id === RED) {
       alert('This element has already been chosen!');
       return false;
     }
