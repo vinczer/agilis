@@ -14,8 +14,6 @@ $(document).ready(function() {
   gameSocket.on('joinRoomSuccess', function(username, room) {
     playerName = username;
 
-    console.log('playerName', playerName);
-
     $('.list-wrapper').hide();
     $('.game-wrapper').show();
   });
@@ -46,30 +44,14 @@ $(document).ready(function() {
     $('.list-wrapper .items').html(tmp);
   });
 
+  gameSocket.on('playerStep', function(username, i, j) {
+    if (playerName === username) return;
+    nextRound(buttons[i][j]);
+    checkWinner();
+    playerTurnCanvasInfo();
+  });
+
   $('.create').click(function() {
-    /*
-    // TODO: create modal for input values
-    // TODO: get parameter names for selected game type,
-    // from game list received on page load (http://localhost:3000/api/games)
-
-    let username = prompt('Username:');
-    let size;
-    let winLength;
-    let success = false;
-    while (!success) {
-      size = prompt('Size:');
-      success = !isNaN(size);
-    }
-    size = parseInt(size);
-    success = false;
-    while (!success) {
-      winLength = prompt('Win Length:');
-      success = !isNaN(winLength);
-    }
-    winLength = parseInt(winLength);
-    gameSocket.emit('createRoom', username, 'amoba', { size, winLength });
-    */
-
     let username = document.getElementById('username').value;
     let size = document.getElementById('size').value;
     let winLength = document.getElementById('winLength').value;
@@ -83,7 +65,6 @@ $(document).ready(function() {
     playerName = username;
 
     $('.connect-wrapper').hide();
-
     $('.game-wrapper').show();
   });
 
@@ -112,20 +93,33 @@ $(document).ready(function() {
 
   let height;
   let width;
-  let canvasInfo = true;
   let winLength;
   let buttons = [];
+  let gameIsRunning = true;
 
   function playerTurnCanvasInfo() {
+    let prevTurnInfo = (!enemyTurn ? "Enemy Player's" : 'Your') + ' turn';
+    ctx.font = '20px Arial';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    // have to call it three times to completely remove previous text
+    ctx.fillText(prevTurnInfo, 278, 170);
+    ctx.fillText(prevTurnInfo, 278, 170);
+    ctx.fillText(prevTurnInfo, 278, 170);
+
     ctx.font = '20px Arial';
     ctx.fillStyle = 'black';
-    if (canvasInfo) {
-      ctx.fillText("player's turn", 220, 170);
-      canvasInfo = false;
+    ctx.textAlign = 'center';
+
+    if (!gameIsRunning) {
+      ctx.fillText('You ' + (enemyTurn ? 'won!' : 'lost!'), 278, 170);
+    } else {
+      ctx.fillText((enemyTurn ? "Enemy Player's" : 'Your') + ' turn', 278, 170);
+
+      let turnColor = enemyTurn ? BLUE : RED;
+      ctx.fillStyle = turnColor;
+      ctx.fillRect(254, 70, 50, 50);
     }
-    if (enemyTurn) ctx.fillStyle = BLUE;
-    else ctx.fillStyle = RED;
-    ctx.fillRect(254, 70, 50, 50);
   }
 
   function createCanvasInfo() {
@@ -142,195 +136,107 @@ $(document).ready(function() {
 
     if (height !== 0 && winLength !== 0) {
       createCanvasInfo();
-      loadGame();
+      createMap();
     }
   }
 
   function createMap() {
-    for (let i = 0; i < width * height; i++) {
-      let j = i + 1;
-      buttons[i] = document.createElement('button');
-      buttons[i].id = NEUTRAL;
-      document.getElementById('body').appendChild(buttons[i]);
-      startStyleButtons(buttons[i]);
-      breakLine(j);
-    }
-  }
-
-  gameSocket.on('playerStep', function(username, idx) {
-    if (playerName === username) return;
-    nextRound(buttons[idx]);
-    checkWinner();
-    playerTurnCanvasInfo();
-  });
-
-  function clickOnButton() {
-    buttons.forEach(function(button, i) {
-      button.addEventListener('click', function() {
-        if (enemyTurn) return;
-        if (nextRound(button)) {
-          gameSocket.emit('playerStep', i);
-          checkWinner();
-          playerTurnCanvasInfo();
-        }
-      });
-    });
-  }
-
-  function breakLine(elementsInRow) {
-    if (elementsInRow % width === 0) {
-      const newLine = document.createElement('br');
+    for (let i = 0; i < height; i++) {
+      let row = [];
+      for (let j = 0; j < width; j++) {
+        let button = document.createElement('button');
+        button.id = NEUTRAL;
+        document.getElementById('body').appendChild(button);
+        startStyleButtons(button);
+        button.addEventListener('click', () => {
+          if (enemyTurn) return;
+          if (nextRound(button)) {
+            gameSocket.emit('playerStep', i, j);
+            checkWinner();
+            playerTurnCanvasInfo();
+          }
+        });
+        row.push(button);
+      }
+      buttons.push(row);
+      let newLine = document.createElement('br');
       document.getElementById('body').appendChild(newLine);
     }
   }
 
-  // change button's color when clicking on a button (2 colors)
+  // change button's color on click (2 colors)
   function nextRound(button) {
-    if (button.style.background.split(' ')[0] !== BLUE && button.style.background.split(' ')[0] !== RED) {
-      if (enemyTurn) {
-        button.style.background = BLUE;
-        button.id = BLUE;
-      } else {
-        button.style.background = RED;
-        button.id = RED;
-      }
-      enemyTurn = !enemyTurn;
-      return true;
-    } else alert('This element has already been chosen!');
-    return false;
+    if (button.id === BLUE && button.id === RED) {
+      alert('This element has already been chosen!');
+      return false;
+    }
+
+    button.style.background = enemyTurn ? BLUE : RED;
+    button.id = enemyTurn ? BLUE : RED;
+    enemyTurn = !enemyTurn;
+    return true;
   }
 
   // check if the board has a winning state or not -> this function is called when a button is clicked
   function checkWinner() {
-    for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].id !== NEUTRAL) {
-        if (horizontalWin(i)) break;
-        if (verticalWin(i)) break;
-        if (rightCrossWin(i)) break;
-        if (leftCrossWin(i)) break;
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        if (buttons[i][j].id !== NEUTRAL) {
+          if (
+            (j + winLength <= width && checkWin(i, j, 0, 1)) ||
+            (i + winLength <= height && checkWin(i, j, 1, 0)) ||
+            (j + winLength <= width && i + winLength <= height && checkWin(i, j, 1, 1)) ||
+            (j - winLength >= -1 && i + winLength <= height && checkWin(i, j, 1, -1))
+          )
+            return;
+        }
       }
     }
   }
 
-  //end game function if the winning buttons are next to each other
-  function endGame(redCounter, blueCounter, i, direction) {
-    if (redCounter === winLength || blueCounter === winLength) {
-      if (direction === 0) horizontalWinColor(i);
-      else if (direction === 1) verticalWinColor(i);
-      else if (direction === 2) rightCrossWinColor(i);
-      else if (direction === 3) leftCrossWinColor(i);
-      alert(buttons[i].id + ' is the winner!');
-      setTimeout(function() {
-        newGame();
-      }, 2000);
-      return true;
-    }
-    return false;
+  //end game function
+  function endGame(winStreak) {
+    if (winStreak.length !== winLength || !gameIsRunning) return false;
+
+    gameIsRunning = false;
+    winStreak.forEach(elem => {
+      elem.style.background = WINNER;
+    });
+
+    setTimeout(function() {
+      clearGame();
+    }, 1000);
+    return true;
   }
 
-  function horizontalValid(i) {
-    let sameRow = 0;
-    for (let m = i; m < i + winLength; m++) {
-      if (Math.floor(m / width) === Math.floor(i / width)) sameRow++;
+  function checkWin(i, j, incI, incJ) {
+    let color = buttons[i][j].id;
+    let k = i + incI;
+    let l = j + incJ;
+    let moves = 1;
+    let winStreak = [buttons[i][j]];
+    while (moves < winLength && k >= 0 && k < height && l >= 0 && l < width) {
+      if (buttons[k][l].id !== color) return false;
+      winStreak.push(buttons[k][l]);
+      moves++;
+      k += incI;
+      l += incJ;
     }
-    return sameRow === winLength;
+    return endGame(winStreak);
   }
 
-  //check if there are winLength number of buttons with the same color are next to each other
-  function horizontalWin(i) {
-    if (horizontalValid(i)) {
-      let redCounter = 0;
-      let blueCounter = 0;
-      for (let k = i; k < i + winLength; k++) {
-        if (buttons[k].id === RED) redCounter++;
-        else if (buttons[k].id === BLUE) blueCounter++;
+  // clear game when it's ended
+  function clearGame() {
+    for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+        buttons[i][j].id = NEUTRAL;
+        startStyleButtons(buttons[i][j]);
       }
-      return endGame(redCounter, blueCounter, i, 0);
-    }
-    return false;
-  }
-
-  //check if there are winLength number of buttons with the same color are under each other
-  function verticalWin(i) {
-    if (i + (winLength - 1) * width < buttons.length) {
-      let redCounter = 0;
-      let blueCounter = 0;
-      for (let m = i; m < i + winLength * width; m += width) {
-        if (buttons[m].id === RED) redCounter++;
-        else if (buttons[m].id === BLUE) blueCounter++;
-      }
-      return endGame(redCounter, blueCounter, i, 1);
-    }
-    return false;
-  }
-
-  //check if there are winLength number of buttons with the same color are under each other "in a cross" to the right
-  function rightCrossWin(i) {
-    if (i + (winLength - 1) * (width + 1) < buttons.length) {
-      let redCounter = 0;
-      let blueCounter = 0;
-      for (let m = i; m < i + winLength * (width + 1); m += width + 1) {
-        if (buttons[m].id === RED) redCounter++;
-        else if (buttons[m].id === BLUE) blueCounter++;
-      }
-      return endGame(redCounter, blueCounter, i, 2);
-    }
-    return false;
-  }
-
-  function leftCrossWin(i) {
-    if (i + (winLength - 1) * width < buttons.length) {
-      let redCounter = 0;
-      let blueCounter = 0;
-      for (let m = i; m < i + winLength * (width - 1); m += width - 1) {
-        if (buttons[m].id === RED) redCounter++;
-        else if (buttons[m].id === BLUE) blueCounter++;
-      }
-      return endGame(redCounter, blueCounter, i, 3);
-    }
-    return false;
-  }
-
-  // new game starts in 2secs after winning, setting every button's value to default
-  function newGame() {
-    for (let i = 0; i < buttons.length; i++) {
-      buttons[i].id = NEUTRAL;
-      startStyleButtons(buttons[i]);
     }
 
     setTimeout(function() {
-      for (let i = 0; i < width * height; i++) {
-        document.getElementById('body').removeChild(buttons[i]);
-      }
-      $('.connect-wrapper').show();
-      $('.list-wrapper').hide();
-      $('.game-wrapper').hide();
-      $('.az-igazi-game-wrapper').hide();
-    }, 2000);
-  }
-
-  function horizontalWinColor(i) {
-    for (let j = i; j < i + winLength; j++) {
-      buttons[j].style.background = WINNER;
-    }
-  }
-
-  function verticalWinColor(i) {
-    for (let j = i; j < i + winLength * width; j += width) {
-      buttons[j].style.background = WINNER;
-    }
-  }
-
-  function rightCrossWinColor(i) {
-    for (let j = i; j < i + winLength * (width + 1); j += width + 1) {
-      buttons[j].style.background = WINNER;
-    }
-  }
-
-  function leftCrossWinColor(i) {
-    for (let j = i; j < i + winLength * (width - 1); j += width - 1) {
-      buttons[j].style.background = WINNER;
-    }
+      location.reload();
+    }, 275);
   }
 
   function startStyleButtons(button) {
@@ -344,10 +250,5 @@ $(document).ready(function() {
     button.style.borderRadius = '6px';
     button.style.marginTop = '-3px';
     button.style.cursor = 'pointer';
-  }
-
-  function loadGame() {
-    createMap();
-    clickOnButton();
   }
 });
