@@ -1,71 +1,53 @@
-# Run server
+# Deployment
 
-## Prerequisites
+## First things first, run the server:
 
- - NodeJS installed
- - MongoDB running (https://hub.docker.com/_/mongo)
+- Server code can be found in ./server folder
 
-        docker run --name mongodb -p 27017:27017 -d mongo
+### Prerequisites
 
-## Init modules
+- NodeJS installed
 
-    npm i
+- MongoDB running on port 27017 (https://hub.docker.com/_/mongo), example docker command:
 
-## Run command
+       docker run --name mongodb -p 27017:27017 -d mongo
+
+- Init modules
+  npm i
+
+- Open port 3000 if it's closed
+
+### Run server
 
     node index
 
-### The Server is listening at http://localhost:3000/
+### If the server succesfully started on localhost, it writes the following logs:
 
-# API
+    > Server running at http://localhost:3000/
+    > Connected to MongoDB.
 
-## /login
+## After the server is running, run the client:
 
- - ### request have to contain the username, i.e.:
-    
-        { "username": "john" }
+- Client code can be found in ./client folder
 
- - ### in case of succesful login, response contains an id for authentication later on:
+- Edit ./client/assets/config.js, change localhost to your server's address:
 
-        {
-            "success": true,
-            "id": "5d926d389d590407544978b8",
-            "msg": "Player added to database!"
-        }
+        SERVER_HOST = 'localhost';
 
-## /logout
+- Run locally:
 
- - ### request <u>header</u> have to contain the user id:
-    
-        { "id": "5d926d389d590407544978b8" }
+  - Open index.html
 
- - ### response, if logout was successful:
-    
-        {
-            "success": true,
-            "msg": "Player logged out!"
-        }
-        
-## /games
- - ### response
-   
-        {
-            "success": true,
-            "games": { id: 5d926d389d590407544978b8, name: "Amoba" }
-        }
-        
- ## /lobbies
- - ### response
-   
-        {
-            "success": true,
-            "games": { id: 5d926d389d590407544978b8, name: "Amoba", playerName: "John" }
-        }
+- Or host the content of ./client/src on your website
 
 # SCREEN DESIGNS
+
 ## Gomoku game icon
+
 ![Image](https://cdn.discordapp.com/attachments/628850179554148353/630851503887745057/amoba_logo_hatterrel.jpg)
+
 ## Torpedo game
+
 ![Image](https://media.discordapp.net/attachments/628850179554148353/630850878869340160/torpedo_logo_hatterrel.jpg?width=676&height=676)
 
 .

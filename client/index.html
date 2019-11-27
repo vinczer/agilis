@@ -4,7 +4,7 @@
     <title>
       WS Játékok
     </title>
-	<link rel="icon" href="./images/favicon.png" sizes="256x256">
+    <link rel="icon" href="./images/favicon.png" sizes="256x256" />
     <link rel="stylesheet" type="text/css" href="assets/style.css" />
     <link rel="stylesheet" type="text/css" href="assets/bootstrap-4.3.1-dist/css/bootstrap.css" />
     <meta charset="UTF-8" />
@@ -13,6 +13,7 @@
   <body>
     <script src="assets/socket.io.js"></script>
     <script src="assets/jquery-3.4.1.min.js"></script>
+    <script src="assets/config.js"></script>
     <script src="assets/script.js"></script>
     <script src="assets/bootstrap-4.3.1-dist/js/bootstrap.js"></script>
 
@@ -86,6 +87,24 @@
       </div>
     </div>
 
+    <div class="modal" id="infoModal" data-keyboard="false" data-backdrop="static">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="infoTitle">Info Modal</h4>
+            <button type="button" class="close" id="infoCloseX">&times;</button>
+          </div>
+          <div class="modal-body">
+            <h5 class="modal-title" id="infoText">Info text</h5>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" id="infoCloseOk" class="btn btn-secondary">Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal" id="createModal">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -94,14 +113,14 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <h5 class="modal-title">Add meg a neved:</54>
+            <h5 class="modal-title">Add meg a neved:</h5>
             <div class="form-group">
               <input type="text" class="form-control" id="username" placeholder="Név" />
             </div>
 
             <h5 class="modal-title">Méret:</h5>
             <div class="form-group">
-              <input type="number" class="form-control" id="size" placeholder="Méret" />
+              <input type="number" step="1" class="form-control" id="size" placeholder="Méret" />
             </div>
 
             <h5 class="modal-title">Győzelmi hossz:</h5>
@@ -111,7 +130,7 @@
           </div>
 
           <div class="modal-footer">
-            <button type="submit" class="btn btn-secondary create" data-dismiss="modal">Ok</button>
+            <button type="submit" class="btn btn-secondary create">Ok</button>
           </div>
         </div>
       </div>
@@ -134,7 +153,7 @@
           </div>
 
           <div class="modal-footer">
-            <button type="submit" class="btn btn-secondary csatlakozas" data-dismiss="modal">Ok</button>
+            <button type="submit" class="btn btn-secondary csatlakozas">Ok</button>
           </div>
         </div>
       </div>

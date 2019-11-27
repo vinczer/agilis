@@ -1,5 +1,13 @@
+function showModal(title, text, onClose) {
+  $('#infoTitle').text(title);
+  $('#infoText').text(text);
+  $('#infoCloseX').click(onClose);
+  $('#infoCloseOk').click(onClose);
+  $('#infoModal').modal('toggle');
+}
+
 $(document).ready(function() {
-  let gameSocket = io('http://localhost:3000/game');
+  let gameSocket = io(`http://${SERVER_HOST}:3000/game`);
   let playerName;
   let enemyTurn;
 
@@ -51,11 +59,31 @@ $(document).ready(function() {
     playerTurnCanvasInfo();
   });
 
+  gameSocket.on('enemyLeft', function() {
+    if (gameIsRunning)
+      showModal('Kilépő ellenfél', 'Az ellenfeled kilépett, vége a játéknak!', () => location.reload());
+  });
+
+  function validateIntField(min, max, fieldId) {
+    let fieldValue = document.getElementById(fieldId).value;
+    if (!fieldValue || isNaN(fieldValue)) return false;
+
+    let validValue = Math.min(max, Math.max(parseInt(fieldValue), min));
+    document.getElementById(fieldId).value = validValue;
+
+    if (+fieldValue !== +validValue) return false;
+    return validValue;
+  }
+
   $('.create').click(function() {
     let username = document.getElementById('username').value;
-    let size = document.getElementById('size').value;
-    let winLength = document.getElementById('winLength').value;
-    if (isNaN(size) || isNaN(winLength)) return;
+    if (!username) return alert('Felhasználónév megadása kötelező!');
+
+    let size = validateIntField(3, 16, 'size');
+    if (!size) return alert('A méret 3 és 16 közti egész szám kell legyen!');
+
+    let winLength = validateIntField(3, 16, 'winLength');
+    if (!winLength) return alert('A győzelmi hossz 3 és 16 közti egész szám kell legyen!');
 
     size = Math.min(10, Math.max(parseInt(size), 3));
     winLength = Math.min(10, Math.max(parseInt(winLength), 3));
@@ -64,6 +92,7 @@ $(document).ready(function() {
 
     playerName = username;
 
+    $('#createModal').modal('toggle');
     $('.connect-wrapper').hide();
     $('.game-wrapper').show();
   });
@@ -78,8 +107,11 @@ $(document).ready(function() {
     let room = $(this).data('room');
     $('.csatlakozas').click(function() {
       let username = document.getElementById('joinname').value;
+      if (!username) return alert('Felhasználónév megadása kötelező!');
 
       gameSocket.emit('joinRoom', username, room);
+
+      $('#connectModal').modal('toggle');
     });
   });
 
@@ -98,7 +130,7 @@ $(document).ready(function() {
   let gameIsRunning = true;
 
   function playerTurnCanvasInfo() {
-    let prevTurnInfo = (!enemyTurn ? "Enemy Player's" : 'Your') + ' turn';
+    let prevTurnInfo = !enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!';
     ctx.font = '20px Arial';
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
@@ -111,15 +143,12 @@ $(document).ready(function() {
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
 
-    if (!gameIsRunning) {
-      ctx.fillText('You ' + (enemyTurn ? 'won!' : 'lost!'), 278, 170);
-    } else {
-      ctx.fillText((enemyTurn ? "Enemy Player's" : 'Your') + ' turn', 278, 170);
+    if (!gameIsRunning) return;
+    ctx.fillText(enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!', 278, 170);
 
-      let turnColor = enemyTurn ? BLUE : RED;
-      ctx.fillStyle = turnColor;
-      ctx.fillRect(254, 70, 50, 50);
-    }
+    let turnColor = enemyTurn ? BLUE : RED;
+    ctx.fillStyle = turnColor;
+    ctx.fillRect(254, 70, 50, 50);
   }
 
   function createCanvasInfo() {
@@ -179,6 +208,7 @@ $(document).ready(function() {
 
   // check if the board has a winning state or not -> this function is called when a button is clicked
   function checkWinner() {
+    let availablePosition = false;
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
         if (buttons[i][j].id !== NEUTRAL) {
@@ -189,8 +219,12 @@ $(document).ready(function() {
             (j - winLength >= -1 && i + winLength <= height && checkWin(i, j, 1, -1))
           )
             return;
-        }
+        } else availablePosition = true;
       }
+    }
+    if (!availablePosition) {
+      gameIsRunning = false;
+      clearGame(true);
     }
   }
 
@@ -203,9 +237,7 @@ $(document).ready(function() {
       elem.style.background = WINNER;
     });
 
-    setTimeout(function() {
-      clearGame();
-    }, 1000);
+    clearGame();
     return true;
   }
 
@@ -226,17 +258,10 @@ $(document).ready(function() {
   }
 
   // clear game when it's ended
-  function clearGame() {
-    for (let i = 0; i < height; i++) {
-      for (let j = 0; j < width; j++) {
-        buttons[i][j].id = NEUTRAL;
-        startStyleButtons(buttons[i][j]);
-      }
-    }
-
-    setTimeout(function() {
-      location.reload();
-    }, 275);
+  function clearGame(isDraw) {
+    if (isDraw) showModal('Döntetlen!', 'Nincs több üres mező, ez így döntetlen!', () => location.reload());
+    else if (enemyTurn) showModal('Ügyes vagy!', 'Gratulálok, nyertél!', () => location.reload());
+    else showModal('Vesztettél!', 'Ez most nem jött össze :(', () => location.reload());
   }
 
   function startStyleButtons(button) {

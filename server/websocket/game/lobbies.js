@@ -83,12 +83,19 @@ module.exports = (io, socket, rooms, games) => {
   });
 
   socket.on('disconnect', function() {
-    console.log('user disconnected');
-    if (!rooms[socket.room]) return;
-    delete rooms[socket.room].users[socket.username];
-    if (socket.room in rooms && Object.keys(rooms[socket.room].users).length < 1) {
+    console.log(socket.username, 'disconnected');
+    if (socket.room in rooms) {
+      delete rooms[socket.room].users[socket.username];
+      if (Object.keys(rooms[socket.room].users).length > 0) return;
       delete rooms[socket.room];
+      broadcastRoomList(io, rooms);
+    } else if (socket.room in games) {
+      delete games[socket.room].users[socket.username];
+      if (Object.keys(games[socket.room].users).length < 1) {
+        delete games[socket.room];
+      } else {
+        io.in(socket.room).emit('enemyLeft');
+      }
     }
-    broadcastRoomList(io, rooms);
   });
 };
