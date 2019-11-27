@@ -130,7 +130,7 @@ $(document).ready(function() {
   let gameIsRunning = true;
 
   function playerTurnCanvasInfo() {
-    let prevTurnInfo = (!enemyTurn ? "Enemy Player's" : 'Your') + ' turn';
+    let prevTurnInfo = !enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!';
     ctx.font = '20px Arial';
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
@@ -143,15 +143,12 @@ $(document).ready(function() {
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
 
-    if (!gameIsRunning) {
-      ctx.fillText('You ' + (enemyTurn ? 'won!' : 'lost!'), 278, 170);
-    } else {
-      ctx.fillText((enemyTurn ? "Enemy Player's" : 'Your') + ' turn', 278, 170);
+    if (!gameIsRunning) return;
+    ctx.fillText(enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!', 278, 170);
 
-      let turnColor = enemyTurn ? BLUE : RED;
-      ctx.fillStyle = turnColor;
-      ctx.fillRect(254, 70, 50, 50);
-    }
+    let turnColor = enemyTurn ? BLUE : RED;
+    ctx.fillStyle = turnColor;
+    ctx.fillRect(254, 70, 50, 50);
   }
 
   function createCanvasInfo() {
@@ -211,6 +208,7 @@ $(document).ready(function() {
 
   // check if the board has a winning state or not -> this function is called when a button is clicked
   function checkWinner() {
+    let availablePosition = false;
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
         if (buttons[i][j].id !== NEUTRAL) {
@@ -221,8 +219,12 @@ $(document).ready(function() {
             (j - winLength >= -1 && i + winLength <= height && checkWin(i, j, 1, -1))
           )
             return;
-        }
+        } else availablePosition = true;
       }
+    }
+    if (!availablePosition) {
+      gameIsRunning = false;
+      clearGame(true);
     }
   }
 
@@ -235,9 +237,7 @@ $(document).ready(function() {
       elem.style.background = WINNER;
     });
 
-    setTimeout(function() {
-      clearGame();
-    }, 1000);
+    clearGame();
     return true;
   }
 
@@ -258,18 +258,10 @@ $(document).ready(function() {
   }
 
   // clear game when it's ended
-  function clearGame() {
-    for (let i = 0; i < height; i++) {
-      for (let j = 0; j < width; j++) {
-        buttons[i][j].id = NEUTRAL;
-        startStyleButtons(buttons[i][j]);
-      }
-    }
-
-    setTimeout(function() {
-      if (enemyTurn) showModal('Ügyes vagy!', 'Gratulálok, nyertél!', () => location.reload());
-      else showModal('Vesztettél!', 'Ez most nem jött össze :(', () => location.reload());
-    }, 275);
+  function clearGame(isDraw) {
+    if (isDraw) showModal('Döntetlen!', 'Nincs több üres mező, ez így döntetlen!', () => location.reload());
+    else if (enemyTurn) showModal('Ügyes vagy!', 'Gratulálok, nyertél!', () => location.reload());
+    else showModal('Vesztettél!', 'Ez most nem jött össze :(', () => location.reload());
   }
 
   function startStyleButtons(button) {
