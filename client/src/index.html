@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>
-      WS Demo
+      WS Játékok
     </title>
 	<link rel="icon" href="./images/favicon.png" sizes="256x256">
     <link rel="stylesheet" type="text/css" href="assets/style.css" />
@@ -11,17 +11,13 @@
   </head>
 
   <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.min.js"
-      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-      crossorigin="anonymous"
-    ></script>
+    <script src="assets/socket.io.js"></script>
+    <script src="assets/jquery-3.4.1.min.js"></script>
     <script src="assets/script.js"></script>
     <script src="assets/bootstrap-4.3.1-dist/js/bootstrap.js"></script>
 
     <div class="container text-center">
-      <h1 class="mb-3">WS Games</h1>
+      <h1 class="mb-3">WS Játékok</h1>
       <div class="connect-wrapper">
         <div class="row">
           <div class="col-12 col-md-6 mb-3">
@@ -35,7 +31,7 @@
                       href="#"
                       class="btn btn-secondary w-100 mb-2 mb-lg-0 "
                       data-toggle="modal"
-                      data-target="#myModal"
+                      data-target="#createModal"
                     >
                       Létrehozás
                     </a>
@@ -68,7 +64,7 @@
 
       <div class="list-wrapper border p-1 bg-light">
         <h2>Lista</h2>
-        <div data-toggle="modal" data-target="#myModal2" class="items "></div>
+        <div data-toggle="modal" data-target="#connectModal" class="items "></div>
         <button onClick="window.location.reload();" type="button" class="btn btn-secondary">Vissza</button>
       </div>
       <div class="game-wrapper border p-1 bg-light">
@@ -89,7 +85,8 @@
         <div></div>
       </div>
     </div>
-    <div class="modal" id="myModal">
+
+    <div class="modal" id="createModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -120,7 +117,7 @@
       </div>
     </div>
 
-    <div class="modal" id="myModal2">
+    <div class="modal" id="connectModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
