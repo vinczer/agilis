@@ -51,11 +51,28 @@ $(document).ready(function() {
     playerTurnCanvasInfo();
   });
 
+  function validateIntField(min, max, fieldId) {
+    let fieldValue = document.getElementById(fieldId).value;
+    if (!fieldValue || isNaN(fieldValue)) return false;
+
+    let validValue = Math.min(max, Math.max(parseInt(fieldValue), min));
+    document.getElementById(fieldId).value = validValue;
+
+    console.log('equals', fieldValue, validValue, fieldValue === validValue);
+
+    if (+fieldValue !== +validValue) return false;
+    return validValue;
+  }
+
   $('.create').click(function() {
     let username = document.getElementById('username').value;
-    let size = document.getElementById('size').value;
-    let winLength = document.getElementById('winLength').value;
-    if (isNaN(size) || isNaN(winLength)) return;
+    if (!username) return alert('Felhasználónév megadása kötelező!');
+
+    let size = validateIntField(3, 16, 'size');
+    if (!size) return alert('A méret 3 és 16 közti egész szám kell legyen!');
+
+    let winLength = validateIntField(3, 16, 'winLength');
+    if (!winLength) return alert('A győzelmi hossz 3 és 16 közti egész szám kell legyen!');
 
     size = Math.min(10, Math.max(parseInt(size), 3));
     winLength = Math.min(10, Math.max(parseInt(winLength), 3));
@@ -64,6 +81,7 @@ $(document).ready(function() {
 
     playerName = username;
 
+    $('#createModal').modal('toggle');
     $('.connect-wrapper').hide();
     $('.game-wrapper').show();
   });
@@ -78,8 +96,11 @@ $(document).ready(function() {
     let room = $(this).data('room');
     $('.csatlakozas').click(function() {
       let username = document.getElementById('joinname').value;
+      if (!username) return alert('Felhasználónév megadása kötelező!');
 
       gameSocket.emit('joinRoom', username, room);
+
+      $('#connectModal').modal('toggle');
     });
   });
 
