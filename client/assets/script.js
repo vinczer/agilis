@@ -7,7 +7,7 @@ function showModal(title, text, onClose) {
 }
 
 $(document).ready(function() {
-  let gameSocket = io(`http://${process.env.HOST || localhost}:3000/game`);
+  let gameSocket = io(`http://${SERVER_HOST}:3000/game`);
   let playerName;
   let enemyTurn;
 
