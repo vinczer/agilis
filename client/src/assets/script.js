@@ -1,3 +1,11 @@
+function showModal(title, text, onClose) {
+  $('#infoTitle').text(title);
+  $('#infoText').text(text);
+  $('#infoCloseX').click(onClose);
+  $('#infoCloseOk').click(onClose);
+  $('#infoModal').modal('toggle');
+}
+
 $(document).ready(function() {
   let gameSocket = io('http://localhost:3000/game');
   let playerName;
@@ -51,14 +59,17 @@ $(document).ready(function() {
     playerTurnCanvasInfo();
   });
 
+  gameSocket.on('enemyLeft', function() {
+    if (gameIsRunning)
+      showModal('Kilépő ellenfél', 'Az ellenfeled kilépett, vége a játéknak!', () => location.reload());
+  });
+
   function validateIntField(min, max, fieldId) {
     let fieldValue = document.getElementById(fieldId).value;
     if (!fieldValue || isNaN(fieldValue)) return false;
 
     let validValue = Math.min(max, Math.max(parseInt(fieldValue), min));
     document.getElementById(fieldId).value = validValue;
-
-    console.log('equals', fieldValue, validValue, fieldValue === validValue);
 
     if (+fieldValue !== +validValue) return false;
     return validValue;
@@ -256,7 +267,8 @@ $(document).ready(function() {
     }
 
     setTimeout(function() {
-      location.reload();
+      if (enemyTurn) showModal('Ügyes vagy!', 'Gratulálok, nyertél!', () => location.reload());
+      else showModal('Vesztettél!', 'Ez most nem jött össze :(', () => location.reload());
     }, 275);
   }
 
