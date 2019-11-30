@@ -72,7 +72,7 @@ function createCanvasInfo() {
     ctx.rect(0, 0, 567, 200);
     ctx.stroke();
 
-    ctx.fillStyle = RED;
+    ctx.fillStyle = "GREEN";
     ctx.fillRect(80, 70, 50, 50);
     ctx.font = "20px Arial";
     ctx.fillStyle = "black";

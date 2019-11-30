@@ -116,9 +116,20 @@ $(document).ready(function() {
     } else {
       ctx.fillText((enemyTurn ? "Enemy Player's" : 'Your') + ' turn', 278, 170);
 
-      let turnColor = enemyTurn ? BLUE : RED;
-      ctx.fillStyle = turnColor;
-      ctx.fillRect(254, 70, 50, 50);
+      var x = new Image();
+      var o = new Image();
+      x.onload = function() {
+        if(enemyTurn){
+          ctx.clearRect(254, 70, 50, 50);
+          ctx.drawImage(x, 254, 70, 50, 50);
+        } else {
+          ctx.clearRect(254, 70, 50, 50);
+          ctx.drawImage(o, 254, 70, 50, 50) ;
+        }
+      };
+      x.src = '../src/images/x.svg';
+      o.src = '../src/images/kor.svg';
+
     }
   }
 
@@ -171,7 +182,7 @@ $(document).ready(function() {
       return false;
     }
 
-    button.style.background = enemyTurn ? BLUE : RED;
+    button.style.background = enemyTurn ? "url('../src/images/x.svg')" : "url('../src/images/kor.svg')";
     button.id = enemyTurn ? BLUE : RED;
     enemyTurn = !enemyTurn;
     return true;
