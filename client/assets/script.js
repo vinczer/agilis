@@ -121,6 +121,8 @@ $(document).ready(function() {
   const NEUTRAL = 'neutral';
   const RED = 'red';
   const BLUE = 'blue';
+  const KOR_SVG = './images/kor.svg';
+  const X_SVG = './images/x.svg';
   const WINNER = '#FFBF00';
 
   let height;
@@ -146,9 +148,19 @@ $(document).ready(function() {
     if (!gameIsRunning) return;
     ctx.fillText(enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!', 278, 170);
 
-    let turnColor = enemyTurn ? BLUE : RED;
-    ctx.fillStyle = turnColor;
-    ctx.fillRect(254, 70, 50, 50);
+    var x = new Image();
+    var o = new Image();
+    x.onload = function() {
+      if (enemyTurn) {
+        ctx.clearRect(254, 70, 50, 50);
+        ctx.drawImage(x, 254, 70, 50, 50);
+      } else {
+        ctx.clearRect(254, 70, 50, 50);
+        ctx.drawImage(o, 254, 70, 50, 50);
+      }
+    };
+    x.src = X_SVG;
+    o.src = KOR_SVG;
   }
 
   function createCanvasInfo() {
@@ -200,7 +212,7 @@ $(document).ready(function() {
       return false;
     }
 
-    button.style.background = enemyTurn ? BLUE : RED;
+    button.style.background = enemyTurn ? `url('${X_SVG}')` : `url('${KOR_SVG}')`;
     button.id = enemyTurn ? BLUE : RED;
     enemyTurn = !enemyTurn;
     return true;
