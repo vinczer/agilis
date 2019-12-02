@@ -10,13 +10,18 @@ $(document).ready(function() {
   let gameSocket = io(`http://${SERVER_HOST}:3000/game`);
   let playerName;
   let enemyTurn;
+  let enemyTurnFirst;
 
   gameSocket.on('connect', function() {
     console.log('Connected WS.');
   });
 
+  gameSocket.on('roomNotFound', function() {
+    alert('Ez a szoba megtelt!');
+  });
+
   gameSocket.on('joinRoomFailed', function(username) {
-    alert('join failed with username ' + username);
+    alert('A megadott felhasználónév már foglalt: ' + username);
   });
 
   gameSocket.on('joinRoomSuccess', function(username, room) {
@@ -28,6 +33,7 @@ $(document).ready(function() {
 
   gameSocket.on('gameStarted', function(playerTurn, parameters) {
     enemyTurn = playerTurn !== playerName;
+    enemyTurnFirst = enemyTurn;
 
     $('.connect-wrapper').hide();
     $('.list-wrapper').hide();
@@ -82,9 +88,16 @@ $(document).ready(function() {
     let size = validateIntField(3, 16, 'size');
     if (!size) return alert('A méret 3 és 16 közti egész szám kell legyen!');
 
-    let winLength = validateIntField(3, 16, 'winLength');
-    if (!winLength) return alert('A győzelmi hossz 3 és 16 közti egész szám kell legyen!');
-
+    let winLength = validateIntField(3, size, 'winLength');
+    if (!winLength) {
+      if (size > 3 + 1) {
+        return alert(`A győzelmi hossz 3 és ${size} közti egész szám kell legyen!`);
+      } else if (size > 3) {
+        return alert(`A győzelmi hossz 3, vagy 4 kell legyen!`);
+      } else {
+        return alert(`A győzelmi hossz 3 kell legyen!`);
+      }
+    }
     size = Math.min(10, Math.max(parseInt(size), 3));
     winLength = Math.min(10, Math.max(parseInt(winLength), 3));
 
@@ -105,13 +118,18 @@ $(document).ready(function() {
 
   $('.list-wrapper').on('click', '.join', function() {
     let room = $(this).data('room');
+    $('.csatlakozas')
+      .prop('onclick', null)
+      .off('click');
+
     $('.csatlakozas').click(function() {
       let username = document.getElementById('joinname').value;
       if (!username) return alert('Felhasználónév megadása kötelező!');
 
+      console.log(room);
       gameSocket.emit('joinRoom', username, room);
 
-      $('#connectModal').modal('toggle');
+      $('#connectModal  .close').click();
     });
   });
 
@@ -121,7 +139,9 @@ $(document).ready(function() {
   const NEUTRAL = 'neutral';
   const RED = 'red';
   const BLUE = 'blue';
-  const WINNER = '#FFBF00';
+  const KOR_SVG = 'images/kor.svg';
+  const X_SVG = 'images/x.svg';
+  const EMPTY = 'images/blank.png';
 
   let height;
   let width;
@@ -146,9 +166,22 @@ $(document).ready(function() {
     if (!gameIsRunning) return;
     ctx.fillText(enemyTurn ? 'Az ellenfeled következik!' : 'Te jössz!', 278, 170);
 
-    let turnColor = enemyTurn ? BLUE : RED;
-    ctx.fillStyle = turnColor;
-    ctx.fillRect(254, 70, 50, 50);
+    var x = new Image();
+    var o = new Image();
+    x.onload = function() {
+      if (enemyTurnFirst) {
+        ctx.clearRect(254, 70, 50, 50);
+        ctx.drawImage(x, 254, 70, 50, 50);
+      }
+    };
+    o.onload = function() {
+      if (!enemyTurnFirst) {
+        ctx.clearRect(254, 70, 50, 50);
+        ctx.drawImage(o, 254, 70, 50, 50);
+      }
+    };
+    x.src = X_SVG;
+    o.src = KOR_SVG;
   }
 
   function createCanvasInfo() {
@@ -173,7 +206,9 @@ $(document).ready(function() {
     for (let i = 0; i < height; i++) {
       let row = [];
       for (let j = 0; j < width; j++) {
-        let button = document.createElement('button');
+        let button = document.createElement('input');
+        button.type = 'image';
+        button.src = EMPTY;
         button.id = NEUTRAL;
         document.getElementById('body').appendChild(button);
         startStyleButtons(button);
@@ -200,7 +235,8 @@ $(document).ready(function() {
       return false;
     }
 
-    button.style.background = enemyTurn ? BLUE : RED;
+    if (!enemyTurnFirst) button.src = enemyTurn ? X_SVG : KOR_SVG;
+    else button.src = enemyTurn ? KOR_SVG : X_SVG;
     button.id = enemyTurn ? BLUE : RED;
     enemyTurn = !enemyTurn;
     return true;
@@ -234,7 +270,7 @@ $(document).ready(function() {
 
     gameIsRunning = false;
     winStreak.forEach(elem => {
-      elem.style.background = WINNER;
+      elem.style.background = enemyTurn ? 'green' : 'red';
     });
 
     clearGame();
