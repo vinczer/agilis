@@ -56,7 +56,7 @@ module.exports = (io, socket, rooms, games) => {
   socket.on('joinRoom', function(username, room) {
     if (room in rooms) {
       if (username in rooms[room].users) {
-        console.log('user escists');
+        console.log('user exists');
         socket.emit('joinRoomFailed', username);
         return;
       }
@@ -78,6 +78,7 @@ module.exports = (io, socket, rooms, games) => {
       io.in(room).emit('gameStarted', Object.keys(games[room].users)[games[room].playerTurn], games[room].parameters);
       console.log(username + ' has connected to ' + room);
     } else {
+      socket.emit('roomNotFound');
       console.log('Room not found: ' + room);
     }
   });
