@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/vinczer/agilis#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "mongoose": "^5.7.5",
     "socket.io": "^2.3.0"
   }
